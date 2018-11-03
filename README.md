@@ -8,4 +8,4 @@ Or import project to Idea and use mvn package execute option
 
 # Usage:
 Run via $ java -jar path/to/filescan.jar<br>
-Use --help option to see all possible commands listlolled hard
+Use --help option to see all possible commands list

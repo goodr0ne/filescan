@@ -4,10 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import picocli.CommandLine;
 
 import javax.swing.filechooser.FileSystemView;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
+import java.io.*;
 
 @CommandLine.Command(name = "filescan",
         mixinStandardHelpOptions = true, version = "goodr0ne.filescan 1.337")
@@ -27,6 +24,24 @@ public class FileScan implements Runnable {
   private static String appendLineArg = "";
 
   private static File foundedFile;
+
+  private static String readFile(File file, boolean isPreview) {
+    StringBuilder output = new StringBuilder();
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+      String line;
+      int count = 0;
+      while ((line = br.readLine()) != null) {
+        output.append(line).append("\n");
+        if (isPreview && (count > 6)) {
+          break;
+        }
+        count++;
+      }
+    } catch (Exception e) {
+      output = new StringBuilder("Exception arrived - " + e.toString());
+    }
+    return output.toString();
+  }
 
   private static void readDrives() {
     System.out.println("-readDrives option execution:");
@@ -102,8 +117,9 @@ public class FileScan implements Runnable {
         System.out.println("Files with size more than 10kb are not allowed for appending\n");
         return;
       }
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter(foundedFile, true))) {
-        writer.append(appendLineArg).append("\n");
+      String content = readFile(foundedFile, false);
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(foundedFile))) {
+        writer.write(appendLineArg + "\n" + content);
       }
     } catch (Exception e) {
       System.out.println("Exception arrived - " + e.toString());
