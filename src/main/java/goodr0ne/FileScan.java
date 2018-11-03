@@ -20,10 +20,10 @@ public class FileScan implements Runnable {
   private static String[] searchFileArgs = {""};
 
   @CommandLine.Option(names = "-appendLine",
-          description = "Add specified string to searched file")
+          description = "Add specified string to searched file (first found one)")
   private static String appendLineArg = "";
 
-  private static File foundedFile;
+  private static File foundFile;
 
   private static String readFile(File file, boolean isPreview) {
     StringBuilder output = new StringBuilder();
@@ -54,6 +54,24 @@ public class FileScan implements Runnable {
     System.out.println();
   }
 
+  private static void previewFoundFiles(File[] files) {
+    int count = 1;
+    for (File file:files) {
+      if (count == 1) {
+        System.out.println("\n" + count + "st Found file - " + file.getName());
+      } else if (count == 2) {
+        System.out.println("\n" + count + "nd Found file - " + file.getName());
+      } else if (count == 3) {
+        System.out.println("\n" + count + "rd Found file - " + file.getName());
+      } else {
+        System.out.println("\n" + count + "th Found file - " + file.getName());
+      }
+      System.out.println("File content preview (first 7 lines):");
+      System.out.println(">>>FILE_BEGINS_HERE>>>" + readFile(file, true) + "<<<FILE_ENDS_HERE<<<");
+      count++;
+    }
+  }
+
   private static int searchFile() {
     int status = 0;
     System.out.println("-searchFile option execution:");
@@ -70,11 +88,9 @@ public class FileScan implements Runnable {
         });
         if ((matchingFiles != null) && (matchingFiles.length > 0)) {
           System.out.println("File(s) found! Total quantity - " + matchingFiles.length);
-          foundedFile = matchingFiles[0];
+          foundFile = matchingFiles[0];
           status = 1;
-          for (File file:matchingFiles) {
-            System.out.println("Founded file - " + file.getName());
-          }
+          previewFoundFiles(matchingFiles);
         } else {
           System.out.println("No File(s) found!");
         }
@@ -85,6 +101,7 @@ public class FileScan implements Runnable {
     } else {
       System.out.println("Launching exact filename match search in all directories");
       System.out.println("Searching filename - " + searchFileArgs[0]);
+
       status = 0;
     }
     System.out.println();
@@ -94,10 +111,14 @@ public class FileScan implements Runnable {
   private static void appendLine() {
     System.out.println("-appendLine option execution:");
     System.out.println("Appending line - " + appendLineArg);
-    System.out.println("To file - " + foundedFile.getName());
-    long size = foundedFile.length() / 1024;
-    System.out.println("File size - " + size + "kb");
-    System.out.println("Placed in path - " + foundedFile.getAbsolutePath());
+    System.out.println("To file - " + foundFile.getName());
+    long size = foundFile.length();
+    if ((size / 1024) > 0) {
+      System.out.println("File size - " + (size / 1024) + "kb");
+    } else {
+      System.out.println("File size - " + size + " bytes");
+    }
+    System.out.println("Placed in path - " + foundFile.getAbsolutePath());
     try {
       if (appendLineArg.length() > 255) {
         System.out.println("Please, use less than 256 chars in desired appended line\n");
@@ -108,8 +129,8 @@ public class FileScan implements Runnable {
                 "that's [a-zA-Z,.-!?_ ]\n");
         return;
       }
-      if (!(foundedFile.getName().endsWith(".txt")
-              || foundedFile.getName().endsWith(".md"))) {
+      if (!(foundFile.getName().endsWith(".txt")
+              || foundFile.getName().endsWith(".md"))) {
         System.out.println("Only .txt or .md files are allowed for line appending\n");
         return;
       }
@@ -117,8 +138,8 @@ public class FileScan implements Runnable {
         System.out.println("Files with size more than 10kb are not allowed for appending\n");
         return;
       }
-      String content = readFile(foundedFile, false);
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter(foundedFile))) {
+      String content = readFile(foundFile, false);
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(foundFile))) {
         writer.write(appendLineArg + "\n" + content);
       }
     } catch (Exception e) {
