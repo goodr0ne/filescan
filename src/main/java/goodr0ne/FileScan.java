@@ -1,33 +1,92 @@
 package goodr0ne;
 
+import org.apache.commons.lang3.StringUtils;
 import picocli.CommandLine;
 
 import javax.swing.filechooser.FileSystemView;
 import java.io.File;
+import java.io.FilenameFilter;
 
-@CommandLine.Command(name = "filescan", mixinStandardHelpOptions = true, version = "goodr0ne.filescan 0.47")
+@CommandLine.Command(name = "filescan",
+        mixinStandardHelpOptions = true, version = "goodr0ne.filescan 1.337")
 public class FileScan implements Runnable {
 
-  @CommandLine.Option(names = "-readDrives" , description = "Outputs all available drives list.")
+  @CommandLine.Option(names = "-readDrives",
+          description = "Outputs all available drives list.")
   private static boolean isReadDrives = false;
+
+  @CommandLine.Option(names = "-searchFile", arity = "1..2",
+          description = "Searches for a file in specified path (1st param - path, 2nd - file) "
+                  + "or by exact name match (single param - file name)")
+  private static String[] searchFileArgs = {""};
+
+  @CommandLine.Option(names = "-appendLine",
+          description = "Add specified string to file, searched by exact-file-match search")
+  private static String appendLineArg = "";
 
   private static void readDrives() {
     System.out.println("-readDrives option execution:");
-    File[] paths;
     FileSystemView fsv = FileSystemView.getFileSystemView();
-    paths = File.listRoots();
+    File[] paths = File.listRoots();
     for (File path:paths) {
       System.out.println("Drive Name: "+path);
       System.out.println("Description: "+fsv.getSystemTypeDescription(path));
     }
-    System.out.println("end of -readDrives");
+    System.out.println();
+  }
+
+  private static int searchFile() {
+    int status = 0;
+    System.out.println("-searchFile option execution:");
+    if (searchFileArgs.length > 1) {
+      System.out.println("Launching partial filename match search in directory");
+      System.out.println("Searching in path - " + searchFileArgs[0]);
+      System.out.println("Searching filename - " + searchFileArgs[1]);
+      try {
+        File path = new File(searchFileArgs[0]);
+        File[] matchingFiles = path.listFiles(new FilenameFilter() {
+          public boolean accept(File dir, String name) {
+            return name.contains(searchFileArgs[1]);
+          }
+        });
+        if ((matchingFiles != null) && (matchingFiles.length > 0)) {
+          System.out.println("File(s) found! Total quantity - " + matchingFiles.length);
+          for (File file:matchingFiles) {
+            System.out.println("Founded file - " + file.getName());
+          }
+        } else {
+          System.out.println("No File(s) found!");
+        }
+      } catch (Exception e) {
+        System.out.println("Exception arrived - " + e.toString());
+        status = -1;
+      }
+    } else {
+      System.out.println("Launching exact filename match search in all directories");
+      System.out.println("Searching filename - " + searchFileArgs[0]);
+      status = 1;
+    }
+    System.out.println();
+    return status;
+  }
+
+  private static void appendLine() {
+    System.out.println("-appendLine option execution:");
+    System.out.println("Appending line - " + appendLineArg + "\n");
   }
 
   public void run() {
-    System.out.println("Hello World!");
+    System.out.println("\nFileScan is launched, fasten your seat belt!\n");
     if (isReadDrives) {
       readDrives();
     }
+    if (!StringUtils.isBlank(searchFileArgs[0])) {
+      int fileFound = searchFile();
+      if (!StringUtils.isBlank(appendLineArg) && fileFound == 1) {
+        appendLine();
+      }
+    }
+    System.out.println("Thanks for using, enjoy your day!");
   }
 
   public static void main(String[] args) {

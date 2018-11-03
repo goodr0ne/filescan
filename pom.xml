@@ -15,10 +15,15 @@
       <artifactId>picocli</artifactId>
       <version>3.7.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.4</version>
+    </dependency>
   </dependencies>
 
   <build>
-    <finalName>filescan</finalName>
+    <finalName>filescan-without-deps</finalName>
 
     <plugins>
       <plugin>
@@ -40,6 +45,8 @@
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
+          <finalName>filescan</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
         </configuration>
       </plugin>
     </plugins>
