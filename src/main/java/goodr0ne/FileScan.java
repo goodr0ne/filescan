@@ -25,11 +25,11 @@ public class FileScan implements Runnable {
           description = "Add specified string to searched file (first found one)")
   private static String appendLineArg = "";
 
-  private static long fileCount = 0;
+  //private static long fileCount = 0;
   private static long recursiveCount = 0;
   private static File foundFile;
   private static ArrayList<File> foundFiles = new ArrayList<>();
-  private static boolean[] isOutputted = {false, false, false, false};
+  //private static boolean[] isOutputted = {false, false, false, false};
 
   private static String readFile(File file, boolean isPreview) {
     StringBuilder output = new StringBuilder();
@@ -60,7 +60,7 @@ public class FileScan implements Runnable {
     System.out.println();
   }
 
-  private static long fileCount(File dir) {
+  /*private static long fileCount(File dir) {
     try {
       File[] files = dir.listFiles();
       int count = 0;
@@ -74,7 +74,7 @@ public class FileScan implements Runnable {
     } catch (Exception e) {
       return 0;
     }
-  }
+  }*/
 
   private static void previewFoundFiles(File[] files) {
     int count = 1;
@@ -96,7 +96,7 @@ public class FileScan implements Runnable {
 
   private static void searchRecursively(File file) {
     recursiveCount++;
-    if (!isOutputted[0] && (recursiveCount > (fileCount / 5))) {
+    /*if (!isOutputted[0] && (recursiveCount > (fileCount / 5))) {
       isOutputted[0] = true;
       System.out.println("Processed 20% of all files");
     } else if (!isOutputted[1] && (recursiveCount > 2 * (fileCount / 5))) {
@@ -108,7 +108,7 @@ public class FileScan implements Runnable {
     } else if (!isOutputted[3] && (recursiveCount > 4 * (fileCount / 5))) {
       isOutputted[3] = true;
       System.out.println("Processed 80% of all files");
-    }
+    }*/
     try {
       if (file.isDirectory()) {
         if (file.canRead()) {
@@ -154,13 +154,13 @@ public class FileScan implements Runnable {
       System.out.println("Launching exact filename match search in all directories");
       System.out.println("Searching filename - " + searchFileArgs[0]);
       File[] drives = File.listRoots();
-      System.out.println("Producing all files recount operation");
+      /*System.out.println("Producing all files recount operation");
       for (File drive:drives) {
         long count = fileCount(new File(drive + "\\"));
         System.out.println("Drive " + drive + " files count - " + count);
         fileCount = fileCount + count;
       }
-      System.out.println("Total files count - " + fileCount);
+      System.out.println("Total files count - " + fileCount);*/
       for (File drive:drives) {
         System.out.println("Searching in drive " + drive);
         long time = System.currentTimeMillis();
@@ -174,6 +174,7 @@ public class FileScan implements Runnable {
       } else {
         System.out.println("No files are found!");
       }
+      System.out.println("Total number of recursive calls - " + recursiveCount);
       status = 1;
     }
     System.out.println();
