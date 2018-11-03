@@ -4,7 +4,9 @@ import org.apache.commons.lang3.StringUtils;
 import picocli.CommandLine;
 
 import javax.swing.filechooser.FileSystemView;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 
 @CommandLine.Command(name = "filescan",
@@ -21,8 +23,10 @@ public class FileScan implements Runnable {
   private static String[] searchFileArgs = {""};
 
   @CommandLine.Option(names = "-appendLine",
-          description = "Add specified string to file, searched by exact-file-match search")
+          description = "Add specified string to searched file")
   private static String appendLineArg = "";
+
+  private static File foundedFile;
 
   private static void readDrives() {
     System.out.println("-readDrives option execution:");
@@ -51,6 +55,8 @@ public class FileScan implements Runnable {
         });
         if ((matchingFiles != null) && (matchingFiles.length > 0)) {
           System.out.println("File(s) found! Total quantity - " + matchingFiles.length);
+          foundedFile = matchingFiles[0];
+          status = 1;
           for (File file:matchingFiles) {
             System.out.println("Founded file - " + file.getName());
           }
@@ -64,7 +70,7 @@ public class FileScan implements Runnable {
     } else {
       System.out.println("Launching exact filename match search in all directories");
       System.out.println("Searching filename - " + searchFileArgs[0]);
-      status = 1;
+      status = 0;
     }
     System.out.println();
     return status;
@@ -72,7 +78,37 @@ public class FileScan implements Runnable {
 
   private static void appendLine() {
     System.out.println("-appendLine option execution:");
-    System.out.println("Appending line - " + appendLineArg + "\n");
+    System.out.println("Appending line - " + appendLineArg);
+    System.out.println("To file - " + foundedFile.getName());
+    long size = foundedFile.length() / 1024;
+    System.out.println("File size - " + size + "kb");
+    System.out.println("Placed in path - " + foundedFile.getAbsolutePath());
+    try {
+      if (appendLineArg.length() > 255) {
+        System.out.println("Please, use less than 256 chars in desired appended line\n");
+        return;
+      }
+      if (!appendLineArg.matches("[a-zA-Z\\Q,.-!?_ \\E]*")) {
+        System.out.println("Please, use only allowed chars in desired appended line, " +
+                "that's [a-zA-Z,.-!?_ ]\n");
+        return;
+      }
+      if (!(foundedFile.getName().endsWith(".txt")
+              || foundedFile.getName().endsWith(".md"))) {
+        System.out.println("Only .txt or .md files are allowed for line appending\n");
+        return;
+      }
+      if (size > 10) {
+        System.out.println("Files with size more than 10kb are not allowed for appending\n");
+        return;
+      }
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(foundedFile, true))) {
+        writer.append(appendLineArg).append("\n");
+      }
+    } catch (Exception e) {
+      System.out.println("Exception arrived - " + e.toString());
+    }
+    System.out.println();
   }
 
   public void run() {
