@@ -2,6 +2,9 @@ package goodr0ne;
 
 import picocli.CommandLine;
 
+import javax.swing.filechooser.FileSystemView;
+import java.io.File;
+
 @CommandLine.Command(name = "filescan", mixinStandardHelpOptions = true, version = "goodr0ne.filescan 0.47")
 public class FileScan implements Runnable {
 
@@ -9,7 +12,15 @@ public class FileScan implements Runnable {
   private static boolean isReadDrives = false;
 
   private static void readDrives() {
-    System.out.println("-readDrives");
+    System.out.println("-readDrives option execution:");
+    File[] paths;
+    FileSystemView fsv = FileSystemView.getFileSystemView();
+    paths = File.listRoots();
+    for (File path:paths) {
+      System.out.println("Drive Name: "+path);
+      System.out.println("Description: "+fsv.getSystemTypeDescription(path));
+    }
+    System.out.println("end of -readDrives");
   }
 
   public void run() {
