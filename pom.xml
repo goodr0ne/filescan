@@ -6,7 +6,43 @@
 
   <groupId>goodr0ne</groupId>
   <artifactId>filescan</artifactId>
+  <packaging>jar</packaging>
   <version>0.47</version>
 
+  <dependencies>
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+      <version>3.7.0</version>
+    </dependency>
+  </dependencies>
 
+  <build>
+    <finalName>filescan</finalName>
+
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>goodr0ne.FileScan</mainClass>
+            </manifest>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
+      </plugin>
+    </plugins>
+
+  </build>
 </project>
