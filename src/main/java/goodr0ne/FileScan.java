@@ -171,11 +171,12 @@ public class FileScan implements Runnable {
       if (foundFiles.size() > 0) {
         System.out.println(foundFiles.size() + " files are found!");
         previewFoundFiles(foundFiles.toArray(new File[0]));
+        foundFile = foundFiles.get(0);
+        status = 1;
       } else {
         System.out.println("No files are found!");
       }
       System.out.println("Total number of recursive calls - " + recursiveCount);
-      status = 1;
     }
     System.out.println();
     return status;
