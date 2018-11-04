@@ -147,7 +147,7 @@ public class FileScan implements Runnable {
   private static void appendLine() {
     System.out.println("-appendLine option execution:");
     System.out.println("Appending line - " + appendLineArg);
-    System.out.println("To file - " + foundFile.getName());
+    System.out.println("To file - " + foundFile.getAbsolutePath());
     long size = foundFile.length();
     if ((size / 1024) > 0) {
       System.out.println("File size - " + (size / 1024) + "kb");
