@@ -170,7 +170,7 @@ public class FileScan implements Runnable {
         System.out.println("Only .txt or .md files are allowed for line appending\n");
         return;
       }
-      if (size > 10) {
+      if ((size / 1024) > 10) {
         System.out.println("Files with size more than 10kb are not allowed for appending\n");
         return;
       }
